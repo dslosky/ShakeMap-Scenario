@@ -19,6 +19,8 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         Run "get_area_from_mag"
     ElseIf Not Intersect(Target, Main.Range("B15")) Is Nothing Then
         Run "get_mechanism"
+    ElseIf Not Intersect(Target, Main.Range("B20")) Is Nothing Then
+        Run "finite_fault_model"
     ElseIf Not Intersect(Target, Main.Range("B21")) Is Nothing Then
         Run "manage_segments"
     ElseIf Target.Count = 1 And Not (Intersect(Target, Main.Range("C:C")) Is Nothing) And Target.Row > 23 Then

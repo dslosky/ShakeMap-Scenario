@@ -55,6 +55,8 @@ Private Sub manage_segments()
     seg_count = Split(Main.Cells(Rows.Count, "B").End(xlUp).Value, " ")(1) * 1
     last_row = Main.Cells(Rows.Count, "C").End(xlUp).Row + 2
     
+    Dim last_seg As Integer
+    
     If seg_count > vars.segment_count Then
         ' find the last row we don't want to delete
         last_seg = vars.segment_start + (vars.segment_count * vars.segment_height)
@@ -65,7 +67,9 @@ Private Sub manage_segments()
         Dim vert_num As Range
         new_seg_count = vars.segment_count - seg_count
         
-        new_seg_start = last_row + 1
+        last_seg = vars.segment_start + (seg_count * vars.segment_height)
+        
+        new_seg_start = last_seg + 1
         'last_new_seg = last_row + 1 + new_seg_count * vars.segment_height
         seg_row = new_seg_start
         For current_seg = seg_count + 1 To seg_count + new_seg_count
@@ -162,3 +166,16 @@ Function num_check(ByVal num_in As String)
     
     num_check = True
 End Function
+
+Private Sub finite_fault_model()
+
+    last_row = Main.Range("C1").SpecialCells(xlCellTypeLastCell).Row
+    
+    If vars.finite_fault_model.Value = "Yes" Then
+        ' Just unhide all rows, because finding the right ones is too hard
+        Main.Range("C:C").EntireRow.Hidden = False
+    ElseIf vars.finite_fault_model.Value = "No" Then
+        Main.Range("A" & vars.segment_count.Row, "A" & last_row).EntireRow.Hidden = True
+    End If
+
+End Sub
