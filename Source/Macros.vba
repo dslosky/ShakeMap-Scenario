@@ -12,7 +12,13 @@ End Sub
 Private Sub get_area_from_mag()
 
     If Not IsEmpty(vars.magnitude) Then
-        vars.mag_area.Value = 10 ^ (-3.49 + 0.91 * vars.magnitude.Value)
+        area_val = 10 ^ (-3.49 + 0.91 * vars.magnitude.Value)
+        
+        If area_val < 2 Then
+            vars.mag_area.Value = Round(area_val, 2)
+        Else
+            vars.mag_area.Value = Round(area_val, 0)
+        End If
     Else
         vars.mag_area.Value = ""
     End If
