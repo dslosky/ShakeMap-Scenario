@@ -1,0 +1,7 @@
+Notes:	Can we make a plot of the verticies with epicenter? 
+	Indicate depth of verticies on plot somehow?
+	Auto generate event.xml and *_fault.txt?
+	Compute strike/dip for simple planar segments?
+	Check that verticies are specified in clockwise OR counterclockwise manner. 
+	Require number of segments and number of verticies to be integers
+	All longitude/latitudes must be in decimal degrees. 
