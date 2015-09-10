@@ -1,8 +1,8 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DateForm 
    ClientHeight    =   4000
-   ClientLeft      =   -1440
-   ClientTop       =   -8280.001
+   ClientLeft      =   -1600
+   ClientTop       =   -9200.001
    ClientWidth     =   7060
    OleObjectBlob   =   "DateForm.frx":0000
    StartUpPosition =   1  'CenterOwner
@@ -12,6 +12,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Private Sub cancel_Click()
     Unload Me
 End Sub

@@ -23,8 +23,12 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         Run "finite_fault_model"
     ElseIf Not Intersect(Target, Main.Range("B21")) Is Nothing Then
         Run "manage_segments"
+        Run "make_plot"
     ElseIf Target.Count = 1 And Not (Intersect(Target, Main.Range("C:C")) Is Nothing) And Target.Row > 23 Then
         Run "manage_vertices", Target
+        Run "make_plot"
+    ElseIf Not Intersect(Target, Main.Range("D25", "W55")) Is Nothing Then
+        Run "copy_vertices"
     End If
 
 ExitSub:
@@ -58,5 +62,6 @@ ExitSub:
     
     Run "protect_workbook"
 End Sub
+
 
 

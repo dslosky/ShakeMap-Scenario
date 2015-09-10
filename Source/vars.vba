@@ -17,6 +17,26 @@ Public segment_count As Range
 Public blank_seg As Range
 Public blank_seg_col As Range
 Public finite_fault_model As Range
+Public segment_max As Integer
+
+Public seg1_range As Range
+Public seg2_range As Range
+Public seg3_range As Range
+Public seg4_range As Range
+Public seg5_range As Range
+Public seg1_copy As Range
+Public seg2_copy As Range
+Public seg3_copy As Range
+Public seg4_copy As Range
+Public seg5_copy As Range
+Public seg1_plot As Range
+Public seg2_plot As Range
+Public seg3_plot As Range
+Public seg4_plot As Range
+Public seg5_plot As Range
+
+Public plot_area As Range
+
 
 Private Sub setup_variables()
     Set vars.eq_name = Main.Range("B7")
@@ -37,5 +57,26 @@ Private Sub setup_variables()
     
     vars.segment_start = 23
     vars.segment_height = 7
+    vars.segment_max = 5
+    
+    ' setup ranges to copy segments
+    Set seg1_range = Main.Range("D25", "W27")
+    Set seg2_range = Main.Range("D32", "W34")
+    Set seg3_range = Main.Range("D39", "W41")
+    Set seg4_range = Main.Range("D46", "W48")
+    Set seg5_range = Main.Range("D53", "W55")
+    Set seg1_copy = Lookup.Range("N1", "AG3")
+    Set seg2_copy = Lookup.Range("N4", "AG6")
+    Set seg3_copy = Lookup.Range("N7", "AG9")
+    Set seg4_copy = Lookup.Range("N10", "AG12")
+    Set seg5_copy = Lookup.Range("N13", "AG15")
+    
+    Set seg1_plot = Lookup.Range("M1", "AG2")
+    Set seg2_plot = Lookup.Range("M4", "AG5")
+    Set seg3_plot = Lookup.Range("M7", "AG8")
+    Set seg4_plot = Lookup.Range("M10", "AG11")
+    Set seg5_plot = Lookup.Range("M13", "AG14")
+    
+    Set plot_area = Main.Range("E5", "H20")
 End Sub
 

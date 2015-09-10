@@ -57,6 +57,17 @@ Private Sub get_dip()
 End Sub
 
 Private Sub manage_segments()
+    ' instead of copying and pasting, let's just hide and unhide rows
+    total_rows = vars.segment_height * vars.segment_max + vars.segment_start
+    show_rows = vars.segment_height * vars.segment_count + vars.segment_start
+
+    
+    Main.Range("A" & show_rows + 1, "A" & total_rows).Rows.Hidden = True
+    Main.Range("A" & vars.segment_start, "A" & show_rows).Rows.Hidden = False
+    
+End Sub
+
+Private Sub manage_segments_old()
     ' find out how many segments we currently have
     seg_count = Split(Main.Cells(Rows.Count, "B").End(xlUp).Value, " ")(1) * 1
     last_row = Main.Cells(Rows.Count, "C").End(xlUp).Row + 2
@@ -88,7 +99,7 @@ Private Sub manage_segments()
             With vert_num.Validation
                 .Delete
                 .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
-                xlBetween, Formula1:="='Lookup Values'!$A$1:$A$100"
+                xlBetween, Formula1:="='Lookup Values'!$A$4:$A$20"
                 .IgnoreBlank = True
                 .InCellDropdown = True
                 .InputTitle = ""
@@ -135,12 +146,29 @@ Private Sub manage_vertices(vertices As Range)
                 .PasteSpecial
                 .Locked = False
             End With
-            
-            
         Next
-        
     End If
+    
+    Run "copy_vertices"
 
+End Sub
+
+Private Sub copy_vertices()
+    
+    ' copy segments
+    vars.seg1_copy.Value = vars.seg1_range.Value
+    vars.seg2_copy.Value = vars.seg2_range.Value
+    vars.seg3_copy.Value = vars.seg3_range.Value
+    vars.seg4_copy.Value = vars.seg4_range.Value
+    vars.seg5_copy.Value = vars.seg5_range.Value
+    
+    If IsEmpty(Lookup.Range("N1")) Then
+        Lookup.Range("N1").Value = 0
+    End If
+    If IsEmpty(Lookup.Range("N2")) Then
+        Lookup.Range("N2").Value = 0
+    End If
+    
 End Sub
 
 Private Sub check_fault_ref()
@@ -179,9 +207,84 @@ Private Sub finite_fault_model()
     
     If vars.finite_fault_model.Value = "Yes" Then
         ' Just unhide all rows, because finding the right ones is too hard
-        Main.Range("C:C").EntireRow.Hidden = False
+        Main.Range("A" & vars.segment_count.Row, "A" & vars.segment_start).EntireRow.Hidden = False
+        
+        Run "manage_segments"
+        
+        ' make a plot
+        Run "make_plot"
     ElseIf vars.finite_fault_model.Value = "No" Then
         Main.Range("A" & vars.segment_count.Row, "A" & last_row).EntireRow.Hidden = True
+        
+        ' delete the segment plot if it exists
+        If Main.ChartObjects.Count > 0 Then
+            Main.ChartObjects.Delete
+        End If
     End If
 
+End Sub
+
+Private Sub make_plot()
+    ' Delete plots that already exist
+    If Main.ChartObjects.Count > 0 Then
+        Main.ChartObjects.Delete
+    End If
+    
+    Dim chart_obj As ChartObject
+    With vars.plot_area
+        Set chart_obj = Main.ChartObjects.Add(.Left, .Top, .Width, .Height)
+    End With
+    
+    Set new_chart = chart_obj.Chart
+    
+    With new_chart
+        .ChartType = xlXYScatterLines
+        'Set data source range.
+        .SetSourceData Source:=vars.seg1_plot, PlotBy:= _
+          xlRows
+        .HasTitle = True
+        .ChartTitle.Text = "Segments"
+         'X axis name
+        .Axes(xlCategory, xlPrimary).HasTitle = True
+        .Axes(xlCategory, xlPrimary).AxisTitle.Characters.Text = "Longitude"
+         'y-axis name
+        .Axes(xlValue, xlPrimary).HasTitle = True
+        .Axes(xlValue, xlPrimary).AxisTitle.Characters.Text = "Latitude"
+        'The Parent property is used to set properties of
+        'the Chart.
+        'With .Parent
+        '    .Top = Range("F9").Top
+        '    .Left = Range("F9").Left
+        '    .Name = "ToolsChart2"
+        'End With
+    End With
+    
+    If vars.segment_count = 1 Then
+        ' segment one is already in there!
+    ElseIf vars.segment_count = 2 Then
+        vars.seg2_plot.Copy
+        new_chart.Paste
+    ElseIf vars.segment_count = 3 Then
+        vars.seg2_plot.Copy
+        new_chart.Paste
+        vars.seg3_plot.Copy
+        new_chart.Paste
+    ElseIf vars.segment_count = 4 Then
+        vars.seg2_plot.Copy
+        new_chart.Paste
+        vars.seg3_plot.Copy
+        new_chart.Paste
+        vars.seg4_plot.Copy
+        new_chart.Paste
+    ElseIf vars.segment_count = 5 Then
+        vars.seg2_plot.Copy
+        new_chart.Paste
+        vars.seg3_plot.Copy
+        new_chart.Paste
+        vars.seg4_plot.Copy
+        new_chart.Paste
+        vars.seg5_plot.Copy
+        new_chart.Paste
+    End If
+    
 End Sub
