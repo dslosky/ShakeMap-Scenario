@@ -250,13 +250,6 @@ Private Sub make_plot()
          'y-axis name
         .Axes(xlValue, xlPrimary).HasTitle = True
         .Axes(xlValue, xlPrimary).AxisTitle.Characters.Text = "Latitude"
-        'The Parent property is used to set properties of
-        'the Chart.
-        'With .Parent
-        '    .Top = Range("F9").Top
-        '    .Left = Range("F9").Left
-        '    .Name = "ToolsChart2"
-        'End With
     End With
     
     If vars.segment_count = 1 Then
@@ -287,4 +280,246 @@ Private Sub make_plot()
         new_chart.Paste
     End If
     
+    vars.hypo_plot.Copy
+    new_chart.Paste
+    
+    With new_chart.SeriesCollection("Hypocenter")
+        .MarkerStyle = xlMarkerStyleTriangle
+        .MarkerForegroundColor = RGB(255, 0, 0)
+        .MarkerBackgroundColor = RGB(255, 0, 0)
+        .MarkerSize = 9
+        .Format.Line.Visible = False
+    End With
 End Sub
+
+Private Sub export_docs()
+    Application.EnableEvents = False
+    Application.ScreenUpdating = False
+    On Error GoTo ExitHandler
+    
+    Application.Run "export_xml"
+    
+ExitHandler:
+    Application.EnableEvents = True
+    Application.ScreenUpdating = True
+End Sub
+
+Private Sub export_xml()
+    Application.Run "make_xml_table"
+    If vars.export_ready = False Then GoTo ExitHandler
+    
+    Dim dir As String
+    Dim file_name As String
+    Dim xml_path As String
+    dir = Application.ActiveWorkbook.Path
+    file_name = "shakemap_scenario.xml"
+
+    If InStr(getOS, "Windows") = 0 Then
+        xml_path = dir & ":" & file_name
+    Else
+        xml_path = dir & "\" & file_name
+    End If
+    
+    Dim xml_string As String
+    xml_string = get_xml_string()
+    
+    Open xml_path For Output As #2
+        Print #2, xml_string
+    Close #2
+    
+    MsgBox "Your scenario has been successfully exported at: " & vbNewLine & _
+                    xml_path
+ExitHandler:
+End Sub
+
+Public Function get_xml_string()
+
+dtd_string = "<?xml version=""1.0"" encoding=""US-ASCII"" standalone=""yes""?>" & _
+                        "<!DOCTYPE earthquake [" & vbNewLine & _
+                        "<!ELEMENT  earthquake EMPTY>" & vbNewLine & _
+                        "<!ATTLIST earthquake" & vbNewLine & _
+                        "  id        ID  #REQUIRED" & vbNewLine & _
+                        "  lat       CDATA   #REQUIRED" & vbNewLine & _
+                        "  lon       CDATA   #REQUIRED" & vbNewLine & _
+                        "  mag       CDATA   #REQUIRED" & vbNewLine & _
+                        "  year          CDATA   #REQUIRED" & vbNewLine & _
+                        "  month         CDATA   #REQUIRED" & vbNewLine & _
+                        "  day           CDATA   #REQUIRED" & vbNewLine & _
+                        "  hour          CDATA   #REQUIRED" & vbNewLine & _
+                        "  minute        CDATA   #REQUIRED" & vbNewLine & _
+                        "  second        CDATA   #REQUIRED" & vbNewLine & _
+                        "  timezone      CDATA   #REQUIRED" & vbNewLine & _
+                        "  depth     CDATA   #REQUIRED" & vbNewLine & _
+                        "  type      CDATA   #REQUIRED" & vbNewLine & _
+                        "  locstring CDATA   #REQUIRED" & vbNewLine & _
+                        "  pga       CDATA   #REQUIRED" & vbNewLine & _
+                        "  pgv       CDATA   #REQUIRED" & vbNewLine & _
+                        "  sp03      CDATA   #REQUIRED" & vbNewLine & _
+                        "  sp10      CDATA   #REQUIRED" & vbNewLine & _
+                        "  sp30      CDATA   #REQUIRED" & vbNewLine & _
+                        "  created   CDATA   #REQUIRED"
+
+dtd_string = dtd_string & ">" & vbNewLine & _
+                     "]>" & vbNewLine
+
+eq_String = "<earthquake "
+
+Dim att_val As String
+For Each att In XML_Table.Range("A1", "Q1")
+    att_val = XML_Table.Cells(att.Row + 1, att.Column).Value
+    
+    eq_String = eq_String & att.Value & "=""" & att_val & """ "
+Next att
+
+eq_String = eq_String & "/>"
+
+get_xml_string = dtd_string & eq_String
+End Function
+
+
+Private Sub make_xml_table()
+
+    Application.Run "check_input"
+    If vars.export_ready = False Then GoTo ExitHandler
+
+    ' split date
+    Dim eq_date() As String
+    eq_date = Split(vars.eq_date, "/")
+    
+    ' split time
+    Dim eq_time() As String
+    eq_time = Split(vars.eq_time.Value, ":")
+    
+    ' id
+    XML_Table.Range("A2").Value = get_id()
+    
+    ' lat
+    XML_Table.Range("B2").Value = vars.hyp_lat
+    
+    ' lon
+    XML_Table.Range("C2").Value = vars.hyp_long
+    
+    ' mag
+    XML_Table.Range("D2").Value = vars.magnitude
+    
+    ' year
+    XML_Table.Range("E2").Value = eq_date(2)
+    
+    ' month
+    XML_Table.Range("F2").Value = eq_date(0)
+    
+    ' day
+    XML_Table.Range("G2").Value = eq_date(1)
+    
+    ' hour
+    XML_Table.Range("H2").Value = eq_time(0)
+    
+    ' minute
+    XML_Table.Range("I2").Value = eq_time(1)
+    
+    ' second
+    XML_Table.Range("J2").Value = eq_time(2)
+    
+    ' timezone
+    XML_Table.Range("K2").Value = vars.timezone.Value
+    
+    ' depth
+    XML_Table.Range("L2").Value = vars.hyp_depth
+    
+    ' locstring
+    XML_Table.Range("M2").Value = vars.eq_name
+    
+    ' created
+    XML_Table.Range("N2").Value = ""
+    
+    ' otime
+    XML_Table.Range("O2").Value = ""
+    
+    ' type
+    XML_Table.Range("P2").Value = ""
+    
+    ' network
+    XML_Table.Range("Q2").Value = vars.network
+    
+ExitHandler:
+If vars.export_ready = False Then
+    MsgBox "Failed to export. Some required fields have been left " & _
+                  "blank. These cells have been highlighted for you and must " & _
+                  "be completed before exporting."
+End If
+
+
+End Sub
+
+Private Sub check_input()
+
+    Dim req_fields(0 To 12) As Variant
+
+    req_fields(0) = vars.eq_name.Address
+    req_fields(1) = vars.eq_date.Address
+    req_fields(2) = vars.eq_time.Address
+    req_fields(3) = vars.timezone.Address
+    req_fields(4) = vars.network.Address
+    req_fields(5) = vars.fault_ref.Address
+    req_fields(6) = vars.magnitude.Address
+    req_fields(7) = vars.rake.Address
+    req_fields(8) = vars.hyp_lat.Address
+    req_fields(9) = vars.hyp_long.Address
+    req_fields(10) = vars.hyp_depth.Address
+    req_fields(11) = vars.finite_fault_model.Address
+    req_fields(12) = vars.segment_count.Address
+    
+    Dim check_range As Range
+    vars.export_ready = True
+    For Each range_address In req_fields
+        Set check_range = Main.Range(range_address)
+            If IsEmpty(check_range) Then
+                check_range.Interior.Color = 6579455
+                vars.export_ready = False
+            Else
+                check_range.Interior.Color = 10213316
+            End If
+    Next range_address
+                         
+
+End Sub
+
+Public Function get_id()
+    
+    Dim id As String
+    id = vars.eq_name
+    id = Replace(id, " ", "_")
+    id = Replace(id, "`", "")
+    id = Replace(id, "~", "")
+    id = Replace(id, "!", "")
+    id = Replace(id, "@", "")
+    id = Replace(id, "#", "")
+    id = Replace(id, "$", "")
+    id = Replace(id, "%", "")
+    id = Replace(id, "^", "")
+    id = Replace(id, "&", "")
+    id = Replace(id, "*", "")
+    id = Replace(id, "(", "")
+    id = Replace(id, ")", "")
+    id = Replace(id, "=", "")
+    id = Replace(id, "+", "")
+    id = Replace(id, ":", "")
+    id = Replace(id, ";", "")
+    id = Replace(id, "'", "")
+    id = Replace(id, """", "")
+    id = Replace(id, "<", "")
+    id = Replace(id, ">", "")
+    id = Replace(id, ",", "")
+    id = Replace(id, ".", "")
+    id = Replace(id, "/", "")
+    id = Replace(id, "?", "")
+    id = Replace(id, "_", "")
+    id = Replace(id, "{", "")
+    id = Replace(id, "}", "")
+    id = Replace(id, "[", "")
+    id = Replace(id, "]", "")
+    id = Replace(id, "\", "")
+    id = Replace(id, "|", "")
+    
+    get_id = id & "_eq"
+End Function

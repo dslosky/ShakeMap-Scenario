@@ -2,6 +2,8 @@ Attribute VB_Name = "vars"
 Public eq_name As Range
 Public eq_date As Range
 Public eq_time As Range
+Public timezone As Range
+Public network As Range
 Public fault_ref As Range
 Public magnitude As Range
 Public mag_area As Range
@@ -35,23 +37,28 @@ Public seg3_plot As Range
 Public seg4_plot As Range
 Public seg5_plot As Range
 
+Public hypo_plot As Range
 Public plot_area As Range
+
+Public export_ready As Boolean
 
 
 Private Sub setup_variables()
     Set vars.eq_name = Main.Range("B7")
     Set vars.eq_date = Main.Range("B8")
     Set vars.eq_time = Main.Range("B9")
-    Set vars.fault_ref = Main.Range("B10")
-    Set vars.magnitude = Main.Range("B13")
-    Set vars.mag_area = Main.Range("B14")
-    Set vars.rake = Main.Range("B15")
-    Set vars.mechanism = Main.Range("B16")
-    Set vars.hyp_long = Main.Range("C17")
-    Set vars.hyp_lat = Main.Range("C18")
-    Set vars.hyp_depth = Main.Range("C19")
-    Set vars.finite_fault_model = Main.Range("B20")
-    Set vars.segment_count = Main.Range("B21")
+    Set vars.timezone = Main.Range("B10")
+    Set vars.network = Main.Range("B11")
+    Set vars.fault_ref = Main.Range("B12")
+    Set vars.magnitude = Main.Range("B15")
+    Set vars.mag_area = Main.Range("B16")
+    Set vars.rake = Main.Range("B17")
+    Set vars.mechanism = Main.Range("B18")
+    Set vars.hyp_long = Main.Range("C19")
+    Set vars.hyp_lat = Main.Range("C20")
+    Set vars.hyp_depth = Main.Range("C21")
+    Set vars.finite_fault_model = Main.Range("B22")
+    Set vars.segment_count = Main.Range("B23")
     Set vars.blank_seg = Lookup.Range("E1:I7")
     Set vars.blank_seg_col = Lookup.Range("I2:I4")
     
@@ -60,11 +67,11 @@ Private Sub setup_variables()
     vars.segment_max = 5
     
     ' setup ranges to copy segments
-    Set seg1_range = Main.Range("D25", "W27")
-    Set seg2_range = Main.Range("D32", "W34")
-    Set seg3_range = Main.Range("D39", "W41")
-    Set seg4_range = Main.Range("D46", "W48")
-    Set seg5_range = Main.Range("D53", "W55")
+    Set seg1_range = Main.Range("D27", "W29")
+    Set seg2_range = Main.Range("D34", "W36")
+    Set seg3_range = Main.Range("D41", "W43")
+    Set seg4_range = Main.Range("D48", "W50")
+    Set seg5_range = Main.Range("D55", "W57")
     Set seg1_copy = Lookup.Range("N1", "AG3")
     Set seg2_copy = Lookup.Range("N4", "AG6")
     Set seg3_copy = Lookup.Range("N7", "AG9")
@@ -76,6 +83,8 @@ Private Sub setup_variables()
     Set seg3_plot = Lookup.Range("M7", "AG8")
     Set seg4_plot = Lookup.Range("M10", "AG11")
     Set seg5_plot = Lookup.Range("M13", "AG14")
+    
+    Set hypo_plot = Lookup.Range("M17", "N18")
     
     Set plot_area = Main.Range("E5", "H20")
 End Sub

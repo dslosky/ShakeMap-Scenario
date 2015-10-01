@@ -8,7 +8,7 @@ Dim vbaType As Integer
 With ThisWorkbook.VBProject
     For i = 1 To .VBComponents.Count
         If .VBComponents(i).CodeModule.CountOfLines > 0 Then
-            moduleName = .VBComponents(i).CodeModule.Name
+            moduleName = .VBComponents(i).CodeModule.name
             vbaType = .VBComponents(i).Type
             
             If vbaType = 1 Then
@@ -38,7 +38,7 @@ With ThisWorkbook.VBProject
     For Each comp In .VBComponents
     
         'modulename = .VBComponents(i%).CodeModule.Name
-        moduleName = comp.CodeModule.Name
+        moduleName = comp.CodeModule.name
         
         vbaType = .VBComponents(moduleName).Type
         
@@ -58,7 +58,7 @@ End With
 ' make a list of files in the target directory
 
 Dim varDir As Variant
-varDir = Dir(dirStr, vbNormal)
+varDir = dir(dirStr, vbNormal)
 
 
 With ThisWorkbook.VBProject
@@ -95,7 +95,7 @@ With ThisWorkbook.VBProject
             End If
         End If
         
-        varDir = Dir
+        varDir = dir
         
     Wend
     ' Next moduleName
